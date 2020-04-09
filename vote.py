@@ -5,6 +5,13 @@ import time
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ChatPermissions
 
+mutetime1 = 0
+
+def get_mutetime1(time1):        
+    print("self.mutetime1=%s" % time1)
+    global mutetime1
+    mutetime1 = time1
+
 class KickUser(object):
     def __init__(self, message):
         self.message_id = message.message_id
@@ -37,6 +44,7 @@ class KickUser(object):
 
     def disagree_counter(self):
         return len(self.disagree)
+
     
     def get_karg(self,arg):
         self.karg = arg
@@ -47,9 +55,9 @@ class KickUser(object):
         self.ktext = text
         print("self.ktext=%s" % self.ktext)
         return (self.ktext)        
-    
+            
     def get_mutetime2(self,time):
-        print("time=%s" % time)
+        print("self.mutetime2=%s" % time)
         self.mutetime2 = time
         return (self.mutetime2)
 
@@ -113,11 +121,7 @@ def delete_keyboard(key):
 
 
 def fuck(bot, update,args):    
-    print("bot=%s" % bot)
-    #print("update=%s" % update)
 
-    mutetime1=60*8
-    #mutetime1=args[0]
     kick_message = update.message.reply_to_message
     if update.message.chat.type == 'private':
         text = '此命令在私聊中不可用'
@@ -166,8 +170,9 @@ def fuck(bot, update,args):
         kick_user.get_ktext(text) 
         kick_user.get_mutetime2(mutetime2)        
         kick_user.get_chatmembers(chatmembers)
-    print("mutetime2=%s" % mutetime2)
-    
+    print("mutetime1=%s" % mutetime1)
+    print("mutetime2=%s" % kick_user.mutetime2)
+
     if kick_user.user_id == bot.get_me().id:
     	text = '【{} {}】总有刁民想害朕!'.format(update.effective_user.name,kick_user.name)
     	bot.send_message(kick_user.chat_id,text)
@@ -176,11 +181,13 @@ def fuck(bot, update,args):
 
     key = str(kick_user.chat_id) + '-' + str(kick_user.user_id)
     print(key)
+    print(type(time.time()))
+    print(type(mutetime1))
     try:
         bot.restrict_chat_member(
             kick_user.chat_id,
             kick_user.user_id,
-            until_date=int(time.time()+mutetime1),
+            until_date=int(time.time()+float(mutetime1)),
             permissions=ChatPermissions(
                 can_send_messages=False,
                 can_send_media_messages=False,
@@ -193,7 +200,7 @@ def fuck(bot, update,args):
         )
     except BaseException as e:
         logging.error(e)
-        text = '【{} {}】刚才发生了什么？'.format(bot.effective_user.name,kick_user.name)
+        text = '【{} {}】刚才发生了什么？'.format(update.effective_user.name,kick_user.name)
         bot.send_message(kick_user.chat_id, text)
         bot.delete_message(kick_user.chat_id, update.message.message_id)
         return
