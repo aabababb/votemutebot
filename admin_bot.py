@@ -2,11 +2,11 @@
 import logging
 from telegram.ext import CommandHandler, MessageHandler, Updater, Filters, CallbackQueryHandler
 
-from vote import fuck, vote
+from vote import fuck, vote,get_mutetime1
 from clear import clear_message
 from filters import status_update
 from start import start
-from functools import partial
+
 
 class AdminBot():
     def __init__(self, token):
@@ -22,7 +22,7 @@ class AdminBot():
 
     def run(self,mutetime1):
         self.dp.add_handler(CommandHandler('start', start))
-        #fuck1 = partial(fuck,mutetime1)
+        get_mutetime1(mutetime1)
         self.dp.add_handler(CommandHandler('fuck', fuck,pass_args=True))
         self.dp.add_handler(CallbackQueryHandler(vote))
         self.dp.add_handler(MessageHandler(status_update, clear_message))
