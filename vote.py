@@ -283,7 +283,7 @@ def vote(bot, update):
         if kick_user.vote_counter() >= max_vote:
             return
 
-        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
+        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}秒，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
 
         if  kick_user.vote_counter() < max_vote:
         
