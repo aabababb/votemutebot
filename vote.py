@@ -116,7 +116,7 @@ def fuck(bot, update,args):
     print("bot=%s" % bot)
     #print("update=%s" % update)
 
-    mutetime1=60
+    mutetime1=60*8
     #mutetime1=args[0]
     kick_message = update.message.reply_to_message
     if update.message.chat.type == 'private':
