@@ -1,3 +1,6 @@
+运行
+python main.py token time
+
 欢迎使用，玩的开心
 回复想要被投票的成员发送的消息，回复内容为 /fuck d 禁言一天 
  其他参数有 
