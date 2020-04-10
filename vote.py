@@ -149,6 +149,13 @@ def fuck(bot, update,args):
         kick_user.get_ktext(text) 
         kick_user.get_mutetime2(mutetime2)        
         kick_user.get_chatmembers(chatmembers)
+    elif kick_user.karg == 'w':
+        mutetime2 = 604800
+        chatmembers = 30
+        text = "一周"
+        kick_user.get_ktext(text) 
+        kick_user.get_mutetime2(mutetime2)        
+        kick_user.get_chatmembers(chatmembers)        
     elif kick_user.karg == 'm':
         mutetime2 = 2592000
         chatmembers = 10
