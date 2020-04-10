@@ -9,6 +9,8 @@ python main.py token time
  
  d 一天  投票人数 1/50 
  
+ w 一周  投票人数 1/30 
+ 
  m 一个月 投票人数 1/10 
  
  f 永久 投票人数 1/2 
