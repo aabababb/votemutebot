@@ -6,8 +6,8 @@ def clear_message(bot, update):
                            
         fname = update.message.from_user.first_name
         uname = update.message.from_user.username
-        fnum = re.match("\d{8}",fname)
-        unum = re.match("\d{8}",uname)
+        fnum = re.search("\d{8}",fname)
+        unum = re.search("\d{8}",uname)
         
         if len(fname) > 30 or  fnum != None or unum != None:
                 
