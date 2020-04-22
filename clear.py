@@ -26,7 +26,7 @@ def clear_message(bot, update):
             logging.error(e)
                 
         if len(fname) > 30 or strname > 20 or fnum != None or lnum != None or unum != None:
-            bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(60))
+            bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
             text = '【{}】 名字有广告，被踢出！'.format(fname)
             bot.send_message(update.message.chat_id, text)
     except Exception as e:
