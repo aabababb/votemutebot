@@ -6,7 +6,7 @@ def clear_message(bot, update):
     try:        
         ltext=len(update.message.text)
         print("ftext=%s" % update.message)
-        print("ftext=%s" % ltext)     
+        print("ltext=%s" % ltext)     
         fname = update.message.from_user.first_name
         fnum = re.search("\d{8}",fname)
         strname = 0
