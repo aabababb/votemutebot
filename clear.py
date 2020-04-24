@@ -12,7 +12,7 @@ def clear_tmessage(bot, update):
         qtext = re.findall('[\u4e00-\u9fa5a-zA-Z0-9]+',update.message.text,re.S)   #只要字符串中的中文，字母，数字
         qtext = "".join(qtext)
         print("qtext=%s" % qtext)
-        tnum2 = re.search("\d{8}",qtext)
+        tnum2 = re.search("\d{9}",qtext)
         
         fname = update.message.from_user.first_name
         fnum = re.search("\d{8}",fname)
