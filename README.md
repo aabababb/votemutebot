@@ -27,4 +27,6 @@ python main.py token time
 
 长文本消息刷屏禁言1小时，联系方式广告禁言8小时 
 
+命令[/findid number] 通过ID找用户名字
+
 不要忘记给权限哦
