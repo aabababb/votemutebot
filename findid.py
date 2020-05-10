@@ -2,7 +2,7 @@
 def findid(bot, update,args):
     chat_id = update.message.chat_id    
     if len(args) == 0:
-        text = "用户ID数字多少？"
+        text = '【{}】你的ID号码为【{}】'.format(update.message.from_user.name,update.message.from_user.id)
         bot.send_message(chat_id, text,parse_mode='HTML',disable_web_page_preview=True)
     else:
         print("args0=%s" % args[0])
