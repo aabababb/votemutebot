@@ -6,6 +6,7 @@ from vote import fuck, vote,get_mutetime1
 from clear import clear_jlmessage,clear_tmessage
 from filters import status_update,ftext
 from start import start
+from findid import findid
 from cao import cao
 
 
@@ -26,6 +27,7 @@ class AdminBot():
         self.dp.add_handler(CommandHandler('cao', cao))
         get_mutetime1(mutetime1)
         self.dp.add_handler(CommandHandler('fuck', fuck,pass_args=True))
+        self.dp.add_handler(CommandHandler('findid', findid,pass_args=True))
         self.dp.add_handler(CallbackQueryHandler(vote))
         self.dp.add_handler(MessageHandler(status_update, clear_jlmessage))
         self.dp.add_handler(MessageHandler(ftext, clear_tmessage))
