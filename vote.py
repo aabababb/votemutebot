@@ -26,6 +26,7 @@ class KickUser(object):
         self.chatmembers = 0
         self.karg = ''
         self.ktext = ''
+        print("self.user_id1=%s" % self.user_id)
         
     def add_agree(self, user):
         if user.id in self.vote_user():
@@ -45,6 +46,25 @@ class KickUser(object):
     def disagree_counter(self):
         return len(self.disagree)
 
+    def get_userid(self,arg1):
+        self.user_id = arg1
+        print("self.user_id=%s" % self.user_id)
+        return (self.user_id)
+
+    def get_fullname(self,arg1):
+        self.full_name = arg1
+        print("self.full_name=%s" % self.full_name)
+        return (self.full_name)
+    
+    def get_username(self,arg1):
+        self.username = arg1
+        print("self.username=%s" % self.username)
+        return (self.username)
+
+    def get_name(self,arg1):
+        self.name = arg1
+        print("self.name=%s" % self.name)
+        return (self.name)
     
     def get_karg(self,arg):
         self.karg = arg
@@ -130,9 +150,30 @@ def fuck(bot, update,args):
 
     if not kick_message:
         bot.delete_message(update.message.chat_id, update.message.message_id)
-        return
-
-    kick_user = KickUser(kick_message)
+        kick_user = KickUser(update.message)
+        if len(args) != 0:
+            try:
+                print("args1=%s" % args[1])
+                arg1 = args[1]
+                kick_user.get_userid(arg1)
+                member = bot.get_chat_member(update.message.chat_id, arg1, timeout=60)
+                #kick_user.get_fullname(member.user.fullname)
+                #kick_user.get_username(member.user.username)
+                kick_user.get_name(member.user.name)
+                print("member-name=%s" % member.user.name)
+                print("kick_user.user_id=%s" % kick_user.user_id)
+                kick_message = update.message
+                print("kick_message-f1=%s" % kick_message)
+                print("kick_user-f1=%s" % kick_user)
+            except BaseException as e:
+                logging.error(e)
+        else:
+            return
+    else:
+        print("kick_message-f=%s" % kick_message)
+        kick_user = KickUser(kick_message)
+        print("kick_user-f=%s" % kick_user)
+    
     if len(args) == 0:
         arg = 'h'
         kick_user.get_karg(arg)
@@ -187,9 +228,10 @@ def fuck(bot, update,args):
     	return
 
     key = str(kick_user.chat_id) + '-' + str(kick_user.user_id)
-    print(key)
-    print(type(time.time()))
-    print(type(mutetime1))
+    print("kick_user.chat_id=%s" % kick_user.chat_id)
+    print("kick_user.user_id=%s" % kick_user.user_id)
+    #print(type(time.time()))
+    #print(type(mutetime1))
     try:
         bot.restrict_chat_member(
             kick_user.chat_id,
@@ -209,7 +251,7 @@ def fuck(bot, update,args):
         logging.error(e)
         text = '【{} {}】刚才发生了什么？'.format(update.effective_user.name,kick_user.name)
         bot.send_message(kick_user.chat_id, text)
-        bot.delete_message(kick_user.chat_id, update.message.message_id)
+        #bot.delete_message(kick_user.chat_id, update.message.message_id)
         return
     try:
 ##        if 'job' in context.chat_data:
@@ -221,8 +263,11 @@ def fuck(bot, update,args):
         base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}秒，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
 
         kickusers.save_kickuser(key, kick_user)
+        try:
 
-        bot.delete_message(update.message.chat_id, update.message.message_id)
+            bot.delete_message(update.message.chat_id, update.message.message_id)
+        except BaseException as e:
+            logging.error(e)
 
         logging.info(kick_user.log())
 
@@ -233,14 +278,16 @@ def fuck(bot, update,args):
             #timeout=60,
             reply_markup=menu_keyboard(key, kick_user.agree_counter(), kick_user.disagree_counter())
         )
-    except (IndexError, ValueError):
-        update.message.reply_text('Usage: /fuck <seconds>')
+    except BaseException as e:
+        logging.error(e)
+    #except (IndexError, ValueError):
+     #   update.message.reply_text('Usage: /fuck <seconds>')
 
     
    
 def vote(bot, update):
         query = update.callback_query
-        print("query=%s" % query)
+        #print("query=%s" % query)
         msg = query.message
         cmd = query.data.split(' ')[0]
         key = query.data.split(' ')[1]
@@ -259,35 +306,46 @@ def vote(bot, update):
                 
         except Exception as e:
             logging.error(e)
-            
+        try:
+            vc=kick_user.vote_counter()
+        except Exception as e:
+            logging.error(e)
         print('allmembers=%s' % allmembers)
         print('max_vote=%s' % max_vote)
-
+        print('vote_counter=%s' % vc)
 
         if not kick_user:
             try:
                 bot.delete_message(msg.chat_id, msg.message_id)
                 bot.answer_callback_query(query.id, "此投票已过期，清理成功")
-            except:
+            except BaseException as e:
+                logging.error(e)
                 bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
             return
 
         if cmd == 'delete':
             try:
                 bot.delete_message(msg.chat_id, msg.message_id)
-            except:
+            except BaseException as e:
+                logging.error(e)
                 bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
 
             if kick_user and kick_user.agree_counter() > max_vote//2:
                 try:
                     bot.delete_message(kick_user.chat_id, kick_user.message_id)
-                except:
+                except BaseException as e:
+                    logging.error(e)
                     bot.answer_callback_query(query.id, "被举报消息已被删除或超出Bot控制范围")
             if key:
                 kickusers.remove_kickuser(key)
             return
 
         if kick_user.vote_counter() >= max_vote:
+            try:
+                print(">= max_vote")
+                bot.answer_callback_query(query.id, "此投票已过期!")
+            except BaseException as e:
+                logging.error(e)
             return
 
         base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}秒，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
@@ -340,8 +398,8 @@ def vote(bot, update):
                             can_send_polls=False,
                             can_send_other_messages=False,
                             can_add_web_page_previews=False,
-                            can_change_info=False,
                             can_invite_users=False,
+                            can_change_info=False,
                             can_pin_messages=False),
                         until_date=int(time.time()+kick_user.mutetime2)
                         )
@@ -350,8 +408,14 @@ def vote(bot, update):
                     bot.restrict_chat_member(
                         kick_user.chat_id,
                         kick_user.user_id,
-                        permissions=ChatPermissions(can_send_messages=True,can_send_media_messages=True, can_send_other_messages=True, can_add_web_page_previews=True,can_send_polls=True)
-                    )
+                        permissions=ChatPermissions(
+                            can_send_messages=True,
+                            can_send_media_messages=True,
+                            can_send_polls=True,
+                            can_send_other_messages=True,
+                            can_add_web_page_previews=True,
+                            can_invite_users=True)
+                        )
 
     ##            bot.edit_message_text(
     ##                message_id=msg.message_id,
@@ -364,9 +428,9 @@ def vote(bot, update):
                     chat_id=msg.chat_id,
                     text=text,
                     #timeout=60,
-                    reply_markup=delete_keyboard(key))
+                    #reply_markup=delete_keyboard(key)
+                    )
 
-                
 
 # 绑定kick,当有人点击kick时,返回投票窗口
 # dispatcher.add_handler(CommandHandler('kick', kick))
