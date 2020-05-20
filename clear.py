@@ -1,11 +1,12 @@
 import re
 import logging
 import time
-from telegram import ChatPermissions
+from telegram import ChatPermissions,ChatMember
 def clear_tmessage(bot, update):
     try:        
         ltext=len(update.message.text)
-        print("ftext=%s" % update.message)
+        print("fupdate=%s" % update)
+        #print("ChatMember=%s" % update.ChatMember)
         print("ltext=%s" % ltext)
         tnum1 = re.search("\d{8}",update.message.text)
         
