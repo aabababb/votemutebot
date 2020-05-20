@@ -18,6 +18,7 @@ def cao(bot, update):
         bot.delete_message(update.message.chat_id, update.message.message_id)
         return
     try: 
+        print("update.message=%s" % update.message)
         bot.delete_message(update.message.chat_id, update.message.message_id)
         chat_member = bot.get_chat_member(update.message.chat_id, cao_message.from_user.id)
         print("chat_member=%s" % chat_member)
@@ -37,7 +38,7 @@ def cao(bot, update):
             print("until_date2=%s" % until_date2)
             if until_date3 == -28800.0 or until_date3 == 0:
                 print("1 until_date3=%s" % until_date3)
-                text = '【{}】 再被【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name)
+                text = '【{}】 再被【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
                 bot.send_message(update.message.chat_id, text)
 
                 bot.restrict_chat_member(
@@ -57,7 +58,7 @@ def cao(bot, update):
                 print("3 until_date3=%s" % until_date3)
                 b=int(until_date3+60)
                 print("b=%s" % b)
-                text = '【{}】 再被【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name)
+                text = '【{}】 再被【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
                 bot.send_message(update.message.chat_id, text)
 
                 bot.restrict_chat_member(
@@ -76,7 +77,7 @@ def cao(bot, update):
                 
         else:
 
-            text = '【{}】被 【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name)
+            text = '【{}】被 【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
             bot.send_message(update.message.chat_id, text)
 
             bot.restrict_chat_member(
