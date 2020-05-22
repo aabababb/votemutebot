@@ -1,6 +1,7 @@
 # coding=UTF-8
 import logging
 import time
+import datetime
 #from pyrogram import ChatPermissions
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup,ChatPermissions
@@ -26,6 +27,14 @@ class KickUser(object):
         self.chatmembers = 0
         self.karg = ''
         self.ktext = ''
+        self.until_date = ''
+
+        self.send_messages = True
+        self.media_messages = True
+        self.polls = True
+        self.other_messages = True
+        self.web_page = True
+        
         print("self.user_id1=%s" % self.user_id)
         
     def add_agree(self, user):
@@ -45,6 +54,33 @@ class KickUser(object):
 
     def disagree_counter(self):
         return len(self.disagree)
+
+
+    def get_send_messages(self,arg1):
+        self.send_messages = arg1
+        print("self.send_messages=%s" % self.send_messages)
+        return (self.send_messages)
+    def get_media_messages(self,arg1):
+        self.media_messages = arg1
+        print("self.media_messages=%s" % self.media_messages)
+        return (self.media_messages)
+    def get_polls(self,arg1):
+        self.polls = arg1
+        print("self.polls=%s" % self.polls)
+        return (self.polls)
+    def get_other_messages(self,arg1):
+        self.other_messages = arg1
+        print("self.other_messages=%s" % self.other_messages)
+        return (self.other_messages)
+    def get_web_page(self,arg1):
+        self.web_page = arg1
+        print("self.web_page=%s" % self.web_page)
+        return (self.web_page)
+    
+    def get_until_date(self,arg1):
+        self.until_date = arg1
+        print("self.until_date=%s" % self.until_date)
+        return (self.until_date)
 
     def get_userid(self,arg1):
         self.user_id = arg1
@@ -233,10 +269,44 @@ def fuck(bot, update,args):
     #print(type(time.time()))
     #print(type(mutetime1))
     try:
+        chat_member = bot.get_chat_member(kick_user.chat_id, kick_user.user_id)
+        print("chat_member=%s" % chat_member)
+        until_date1 = chat_member.until_date
+        print("v-until_date1=%s" % until_date1)
+        if  until_date1 != None :
+            now_stamp = time.time()
+            local_time = datetime.datetime.fromtimestamp(now_stamp)
+            utc_time = datetime.datetime.utcfromtimestamp(now_stamp)
+            offset = local_time - utc_time
+            print("offset=%s" % offset)
+            until_date2 = until_date1 + offset
+            
+            a = until_date2.timetuple()           
+            until_date3 = time.mktime(a)
+            print("until_date2=%s" % until_date2)
+            print("until_date3=%s" % until_date3)
+
+            kick_user.get_until_date(until_date3)
+            kick_user.get_send_messages(chat_member.can_send_messages)
+            kick_user.get_media_messages(chat_member.can_send_media_messages)
+            kick_user.get_polls(chat_member.can_send_polls)
+            kick_user.get_other_messages(chat_member.can_send_other_messages)
+            kick_user.get_web_page(chat_member.can_add_web_page_previews)
+
+        else:
+            until_date4=time.time()+int(mutetime1)
+            print("until_date4=%s" % until_date4)
+            
+            kick_user.get_until_date(until_date4)
+    except BaseException as e:
+        logging.error(e)
+    
+    try:
+        print("1-until_date=%s" % kick_user.until_date)
         bot.restrict_chat_member(
             kick_user.chat_id,
             kick_user.user_id,
-            until_date=int(time.time()+float(mutetime1)),
+            until_date= kick_user.until_date,
             permissions=ChatPermissions(
                 can_send_messages=False,
                 can_send_media_messages=False,
@@ -258,9 +328,10 @@ def fuck(bot, update,args):
 ##            old_job = context.chat_data['job']
 ##            old_job.schedule_removal()
 ##        new_job = context.job_queue.run_once(alarm, due, context=chat_id)
-##        context.chat_data['job'] = new_job     
+##        context.chat_data['job'] = new_job
+        ctime=datetime.datetime.fromtimestamp(kick_user.until_date)
 
-        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}秒，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
+        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ctime)
 
         kickusers.save_kickuser(key, kick_user)
         try:
@@ -347,8 +418,9 @@ def vote(bot, update):
             except BaseException as e:
                 logging.error(e)
             return
+        ctime=datetime.datetime.fromtimestamp(kick_user.until_date)
 
-        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言{}秒，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,mutetime1)
+        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ctime)
 
         if  kick_user.vote_counter() < max_vote:
         
@@ -387,36 +459,57 @@ def vote(bot, update):
 
             if kick_user.vote_counter() == max_vote:
                 if kick_user.agree_counter() > kick_user.disagree_counter():
-                    text = '经投票,同意禁言【{} {} 】 {}'.format(kick_user.name,kick_user.user_id,kick_user.ktext)
-                    #bot.kick_chat_member(kick_user.chat_id, kick_user.user_id)
-                    bot.restrict_chat_member(
-                        kick_user.chat_id,
-                        kick_user.user_id,
-                        permissions=ChatPermissions(
-                            can_send_messages=False,
-                            can_send_media_messages=False,
-                            can_send_polls=False,
-                            can_send_other_messages=False,
-                            can_add_web_page_previews=False,
-                            can_invite_users=False,
-                            can_change_info=False,
-                            can_pin_messages=False),
-                        until_date=int(time.time()+kick_user.mutetime2)
-                        )
-                else:
-                    text = '经投票,不同意禁言【{} {}】,已恢复该用户所有权限'.format(kick_user.name,kick_user.user_id)
-                    bot.restrict_chat_member(
-                        kick_user.chat_id,
-                        kick_user.user_id,
-                        permissions=ChatPermissions(
-                            can_send_messages=True,
-                            can_send_media_messages=True,
-                            can_send_polls=True,
-                            can_send_other_messages=True,
-                            can_add_web_page_previews=True,
-                            can_invite_users=True)
-                        )
+                    try:
+                        text = '经投票,同意禁言【{} {} 】 {}'.format(kick_user.name,kick_user.user_id,kick_user.ktext)
+                        print("t-until_date=%s" % kick_user.until_date)
+                        print("t-mutetime2=%s" % kick_user.mutetime2)
 
+                        until_date5 = kick_user.until_date
+                        mutetime2 = kick_user.mutetime2
+                        print("t-until_date5=%s" % until_date5)
+                        if until_date5==0:
+                            c=kick_user.until_date
+                        elif mutetime2==6:
+                            c=6
+                        else:
+                            c=until_date5+int(kick_user.mutetime2)
+                        print("c")
+                        print(c)
+                        #bot.kick_chat_member(kick_user.chat_id, kick_user.user_id)
+                        bot.restrict_chat_member(
+                            kick_user.chat_id,
+                            kick_user.user_id,
+                            permissions=ChatPermissions(
+                                can_send_messages=False,
+                                can_send_media_messages=False,
+                                can_send_polls=False,
+                                can_send_other_messages=False,
+                                can_add_web_page_previews=False,
+                                can_invite_users=True,
+                                can_change_info=False,
+                                can_pin_messages=False),
+                            until_date=c
+                            )
+                    except BaseException as e:
+                        logging.error(e)
+                else:
+                    try:
+                        text = '经投票,不同意禁言【{} {}】,已恢复该用户原有权限'.format(kick_user.name,kick_user.user_id)
+                        print("t-until_date=%s" % kick_user.until_date)
+                        bot.restrict_chat_member(
+                            kick_user.chat_id,
+                            kick_user.user_id,
+                            permissions=ChatPermissions(
+                                can_invite_users=True,
+                                can_send_messages=kick_user.send_messages,
+                                can_send_media_messages=kick_user.media_messages,
+                                can_send_polls=kick_user.polls,
+                                can_send_other_messages=kick_user.other_messages,
+                                can_add_web_page_previews=kick_user.web_page),
+                            until_date=kick_user.until_date
+                            )
+                    except BaseException as e:
+                        logging.error(e)
     ##            bot.edit_message_text(
     ##                message_id=msg.message_id,
     ##                chat_id=msg.chat.id,
