@@ -27,7 +27,7 @@ class KickUser(object):
         self.chatmembers = 0
         self.karg = ''
         self.ktext = ''
-        self.until_date = ''
+        self.until_date = None
 
         self.send_messages = True
         self.media_messages = True
@@ -273,31 +273,43 @@ def fuck(bot, update,args):
         print("chat_member=%s" % chat_member)
         until_date1 = chat_member.until_date
         print("v-until_date1=%s" % until_date1)
-        if  until_date1 != None :
-            now_stamp = time.time()
-            local_time = datetime.datetime.fromtimestamp(now_stamp)
-            utc_time = datetime.datetime.utcfromtimestamp(now_stamp)
-            offset = local_time - utc_time
-            print("offset=%s" % offset)
+        now_stamp = time.time()
+        local_time = datetime.datetime.fromtimestamp(now_stamp)
+        utc_time = datetime.datetime.utcfromtimestamp(now_stamp)
+        offset = local_time - utc_time
+        print("offset=%s" % offset)
+                    
+        if  until_date1 == None :
+            print("until_date1 None")
+            until_date4=time.time()+int(mutetime1)
+            print("until_date4=%s" % until_date4)            
+            kick_user.get_until_date(until_date4)        	
+
+        else:
             until_date2 = until_date1 + offset
-            
             a = until_date2.timetuple()           
             until_date3 = time.mktime(a)
             print("until_date2=%s" % until_date2)
             print("until_date3=%s" % until_date3)
-
+            print("until_date1 no None")
             kick_user.get_until_date(until_date3)
             kick_user.get_send_messages(chat_member.can_send_messages)
             kick_user.get_media_messages(chat_member.can_send_media_messages)
             kick_user.get_polls(chat_member.can_send_polls)
             kick_user.get_other_messages(chat_member.can_send_other_messages)
             kick_user.get_web_page(chat_member.can_add_web_page_previews)
+            if until_date3==0:
+                print("send_messages=%s" % kick_user.send_messages)
+                if kick_user.send_messages==True:
+                   until_date7=time.time()+int(mutetime1)
+                   print("until_date7=%s" % until_date7)
+                   kick_user.get_until_date(until_date7)
+                else:
+                   kick_user.get_until_date(until_date3)
+            else:
+                kick_user.get_until_date(until_date3)
 
-        else:
-            until_date4=time.time()+int(mutetime1)
-            print("until_date4=%s" % until_date4)
             
-            kick_user.get_until_date(until_date4)
     except BaseException as e:
         logging.error(e)
     
@@ -329,9 +341,12 @@ def fuck(bot, update,args):
 ##            old_job.schedule_removal()
 ##        new_job = context.job_queue.run_once(alarm, due, context=chat_id)
 ##        context.chat_data['job'] = new_job
-        ctime=datetime.datetime.fromtimestamp(kick_user.until_date)
-
-        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ctime)
+        print("a-until_date4=%s" % kick_user.until_date)
+        utime=datetime.datetime.utcfromtimestamp(kick_user.until_date)
+        print("a-until_date4=%s" % utime)
+        ltime = utime+datetime.timedelta(hours=8)
+        
+        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ltime)
 
         kickusers.save_kickuser(key, kick_user)
         try:
@@ -418,9 +433,14 @@ def vote(bot, update):
             except BaseException as e:
                 logging.error(e)
             return
-        ctime=datetime.datetime.fromtimestamp(kick_user.until_date)
-
-        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ctime)
+            
+        print("b-until_date4=%s" % kick_user.until_date)        
+        utime=datetime.datetime.utcfromtimestamp(kick_user.until_date)
+        print("b-until_date4=%s" % utime)
+        ltime = utime+datetime.timedelta(hours=8)
+        print("b-until_date4=%s" % ltime)
+        
+        base_text = '正在投票禁言群成员【{} {} 】  {}.\n产生投票结果前，该用户被禁言到{}，请尽快投票！\n'.format(kick_user.name,kick_user.user_id,kick_user.ktext,ltime)
 
         if  kick_user.vote_counter() < max_vote:
         
@@ -468,11 +488,20 @@ def vote(bot, update):
                         mutetime2 = kick_user.mutetime2
                         print("t-until_date5=%s" % until_date5)
                         if until_date5==0:
-                            c=kick_user.until_date
-                        elif mutetime2==6:
-                            c=6
+                            
+                            if kick_user.send_messages == True:
+                                c = time.time()+int(kick_user.mutetime2)
+                            else:
+                                c = 6
+                        elif until_date5<time.time():
+                            c = time.time()+int(kick_user.mutetime2)
+                        elif until_date5==None:
+                            c = time.time()+int(kick_user.mutetime2)
                         else:
-                            c=until_date5+int(kick_user.mutetime2)
+                            if mutetime2==6:
+                                c=6
+                            else:
+                                c=until_date5+int(kick_user.mutetime2)
                         print("c")
                         print(c)
                         #bot.kick_chat_member(kick_user.chat_id, kick_user.user_id)
