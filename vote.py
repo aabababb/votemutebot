@@ -215,7 +215,8 @@ def fuck(bot, update,args):
         kick_user = KickUser(kick_message)
         print("kick_user-f=%s" % kick_user)
     try:
-        efftime1=kickusers.efftime.get(update.effective_user.id)
+        effid=str(update.message.chat_id)+'-'+str(update.effective_user.id)
+        efftime1=kickusers.efftime.get(effid)
         print("efftime1=%s" % efftime1)
         a = update.message.date.timetuple()           
         efftime2 = time.mktime(a)
@@ -228,13 +229,10 @@ def fuck(bot, update,args):
                 text = '【{} {}】不能发起投票禁言【{}】，每人每天只能发起一次！'.format(update.effective_user.name,update.effective_user.id,kick_user.name)
                 bot.send_message(kick_user.chat_id,text)
                 return
-            else:
-
-                kickusers.get_efftime(update.effective_user.id,efftime2)
-            
+            else:               
+                kickusers.get_efftime(effid,efftime2)           
         else:
-            
-            kickusers.get_efftime(update.effective_user.id,efftime2)
+            kickusers.get_efftime(effid,efftime2)
     except BaseException as e:
         logging.error(e)     
     
