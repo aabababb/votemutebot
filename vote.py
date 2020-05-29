@@ -35,8 +35,8 @@ class KickUser(object):
         self.other_messages = True
         self.web_page = True
         
-        print("self.user_id1=%s" % self.user_id)
-        
+        print("self.user_id1=%s" % self.user_id)  	
+           
     def add_agree(self, user):
         if user.id in self.vote_user():
             return False
@@ -136,6 +136,7 @@ class KickUser(object):
 class KickUsers():
     def __init__(self):
         self.kickusers = {}
+        self.efftime= {}
 
     def get_kickuser(self, key):
         return self.kickusers.get(key)
@@ -152,7 +153,11 @@ class KickUsers():
             vtime=i
             print('time=%s' % vtime)
             return vtime
-    
+    def get_efftime(self,userid,time):    	  
+        dict1={userid:time}
+        self.efftime.update(dict1)      
+        print("self.efftime=%s" % self.efftime)
+        return (self.efftime)    
 
     def log(self):
         ret = ''
@@ -183,7 +188,7 @@ def fuck(bot, update,args):
         text = '此命令在私聊中不可用'
         bot.send_message(update.message.chat_id, text)
         return
-
+       	
     if not kick_message:
         bot.delete_message(update.message.chat_id, update.message.message_id)
         kick_user = KickUser(update.message)
@@ -209,6 +214,29 @@ def fuck(bot, update,args):
         print("kick_message-f=%s" % kick_message)
         kick_user = KickUser(kick_message)
         print("kick_user-f=%s" % kick_user)
+    try:
+        efftime1=kickusers.efftime.get(update.effective_user.id)
+        print("efftime1=%s" % efftime1)
+        a = update.message.date.timetuple()           
+        efftime2 = time.mktime(a)
+        print("efftime2=%s" % efftime2)
+        if efftime1 != None:
+            efftime3=efftime2-efftime1
+            print("efftime3=%s" % efftime3)
+            if efftime3<86400:
+                bot.delete_message(update.message.chat_id, update.message.message_id)
+                text = '【{} {}】不能发起投票禁言【{}】，每人每天只能发起一次！'.format(update.effective_user.name,update.effective_user.id,kick_user.name)
+                bot.send_message(kick_user.chat_id,text)
+                return
+            else:
+
+                kickusers.get_efftime(update.effective_user.id,efftime2)
+            
+        else:
+            
+            kickusers.get_efftime(update.effective_user.id,efftime2)
+    except BaseException as e:
+        logging.error(e)     
     
     if len(args) == 0:
         arg = 'h'
@@ -268,6 +296,7 @@ def fuck(bot, update,args):
     print("kick_user.user_id=%s" % kick_user.user_id)
     #print(type(time.time()))
     #print(type(mutetime1))
+    
     try:
         chat_member = bot.get_chat_member(kick_user.chat_id, kick_user.user_id)
         print("chat_member=%s" % chat_member)
