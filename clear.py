@@ -39,7 +39,12 @@ def clear_tmessage(bot, update):
         if len(fname) > 30 or strname > 20 or fnum != None or lnum != None or unum != None:
             bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
             text = '【{},{}】 名字有广告，被踢出！'.format(fname,lname)
-            bot.send_message(update.message.chat_id, text)
+            #bot.send_message(update.message.chat_id, text)
+            query = bot.send_message(update.message.chat_id, text)
+            message_id1=query.message_id
+            print("send_message1=%s" % query)
+            time.sleep(3)
+            bot.delete_message(update.message.chat_id,message_id1)            
         if ltext > 666:
             bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
             bot.restrict_chat_member(
@@ -121,7 +126,11 @@ def clear_jlmessage(bot, update):
         if len(fname) > 30 or strname > 20 or fnum != None or lnum != None or unum != None:
             bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
             text = '【{},{}】 名字有广告，被踢出！'.format(fname,lname)
-            bot.send_message(update.message.chat_id, text)
-
+            #bot.send_message(update.message.chat_id, text)
+            query = bot.send_message(update.message.chat_id, text)
+            message_id1=query.message_id
+            print("send_message2=%s" % query)
+            time.sleep(3)
+            bot.delete_message(update.message.chat_id,message_id1)
     except Exception as e:
         logging.error(e)
