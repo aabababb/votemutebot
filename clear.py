@@ -45,7 +45,7 @@ def clear_tmessage(bot, update):
             print("send_message1=%s" % query)
             time.sleep(3)
             bot.delete_message(update.message.chat_id,message_id1)            
-        if ltext > 666:
+        if ltext > 666  or ltext == 1 :
             bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
             bot.restrict_chat_member(
                 update.message.chat_id,
