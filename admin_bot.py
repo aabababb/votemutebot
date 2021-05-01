@@ -11,10 +11,13 @@ from cao import cao
 
 
 class AdminBot():
-    def __init__(self, token):
-        self.updater = Updater(token=token)
+    def __init__(self, token1):
+        self.updater = Updater(token=token1,use_context=True)
+        print(self.updater)
         self.dp = self.updater.dispatcher
-
+        print(self.dp)
+        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
     def error(self, bot, update,error):
         try:
             bot.deleteWebhook()
