@@ -4,23 +4,23 @@ import time
 import datetime
 from telegram import ChatPermissions
 
-def cao(bot, update):
+def cao(update,context):
 	
     cao_message = update.message.reply_to_message
     print("cao_message=%s" % cao_message)
 
     if update.message.chat.type == 'private':
         text = '此命令在私聊中不可用'
-        bot.send_message(update.message.chat_id, text)
+        context.bot.send_message(update.message.chat_id, text)
         return
 
     if not cao_message:
-        bot.delete_message(update.message.chat_id, update.message.message_id)
+        context.bot.delete_message(update.message.chat_id, update.message.message_id)
         return
     try: 
         print("update.message=%s" % update.message)
-        bot.delete_message(update.message.chat_id, update.message.message_id)
-        chat_member = bot.get_chat_member(update.message.chat_id, cao_message.from_user.id)
+        context.bot.delete_message(update.message.chat_id, update.message.message_id)
+        chat_member = context.bot.get_chat_member(update.message.chat_id, cao_message.from_user.id)
         print("chat_member=%s" % chat_member)
         until_date1 = chat_member.until_date
         print("until_date1=%s" % until_date1)
@@ -39,9 +39,9 @@ def cao(bot, update):
             if until_date3 == -28800.0 or until_date3 == 0:
                 print("1 until_date3=%s" % until_date3)
                 text = '【{}】 再被【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
-                bot.send_message(update.message.chat_id, text)
+                context.bot.send_message(update.message.chat_id, text)
 
-                bot.restrict_chat_member(
+                context.bot.restrict_chat_member(
                 update.message.chat_id,
                 cao_message.from_user.id,
                 until_date=int(time.time()+60),
@@ -59,9 +59,9 @@ def cao(bot, update):
                 b=int(until_date3+60)
                 print("b=%s" % b)
                 text = '【{}】 再被【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
-                bot.send_message(update.message.chat_id, text)
+                context.bot.send_message(update.message.chat_id, text)
 
-                bot.restrict_chat_member(
+                context.bot.restrict_chat_member(
                 update.message.chat_id,
                 cao_message.from_user.id,
                 until_date=b,
@@ -78,9 +78,9 @@ def cao(bot, update):
         else:
 
             text = '【{}】被 【{}】ID【{}】禁言1分钟！'.format(cao_message.from_user.name,update.effective_user.name,update.effective_user.id)
-            bot.send_message(update.message.chat_id, text)
+            context.bot.send_message(update.message.chat_id, text)
 
-            bot.restrict_chat_member(
+            context.bot.restrict_chat_member(
             update.message.chat_id,
             cao_message.from_user.id,
             until_date=int(time.time()+60),
