@@ -181,23 +181,23 @@ def delete_keyboard(key):
     return InlineKeyboardMarkup(delete)
 
 
-def fuck(bot, update,args):    
+def fuck(update,context):    
 
     kick_message = update.message.reply_to_message
     if update.message.chat.type == 'private':
         text = '此命令在私聊中不可用'
-        bot.send_message(update.message.chat_id, text)
+        context.bot.send_message(update.message.chat_id, text)
         return
        	
     if not kick_message:
-        bot.delete_message(update.message.chat_id, update.message.message_id)
+        context.bot.delete_message(update.message.chat_id, update.message.message_id)
         kick_user = KickUser(update.message)
-        if len(args) != 0:
+        if len(context.args) != 0:
             try:
-                print("args1=%s" % args[1])
-                arg1 = args[1]
+                print("context.args1=%s" % context.args[1])
+                arg1 = context.args[1]
                 kick_user.get_userid(arg1)
-                member = bot.get_chat_member(update.message.chat_id, arg1, timeout=60)
+                member = context.bot.get_chat_member(update.message.chat_id, arg1, timeout=60)
                 #kick_user.get_fullname(member.user.fullname)
                 #kick_user.get_username(member.user.username)
                 kick_user.get_name(member.user.name)
@@ -225,9 +225,9 @@ def fuck(bot, update,args):
             efftime3=efftime2-efftime1
             print("efftime3=%s" % efftime3)
             if efftime3<86400:
-                bot.delete_message(update.message.chat_id, update.message.message_id)
+                context.bot.delete_message(update.message.chat_id, update.message.message_id)
                 text = '【{} {}】不能发起投票禁言【{}】，每人每天只能发起一次！'.format(update.effective_user.name,update.effective_user.id,kick_user.name)
-                bot.send_message(kick_user.chat_id,text)
+                context.bot.send_message(kick_user.chat_id,text)
                 return
             else:               
                 kickusers.get_efftime(effid,efftime2)           
@@ -236,12 +236,12 @@ def fuck(bot, update,args):
     except BaseException as e:
         logging.error(e)     
     
-    if len(args) == 0:
+    if len(context.args) == 0:
         arg = 'h'
         kick_user.get_karg(arg)
     else:
-    	print("args0=%s" % args[0])
-    	arg = args[0]
+    	print("context.args0=%s" % context.args[0])
+    	arg = context.args[0]
     	kick_user.get_karg(arg)
 
     print("kick_user.karg=%s" % kick_user.karg)
@@ -283,10 +283,10 @@ def fuck(bot, update,args):
     print("mutetime1=%s" % mutetime1)
     print("mutetime2=%s" % kick_user.mutetime2)
 
-    if kick_user.user_id == bot.get_me().id:
+    if kick_user.user_id == context.bot.get_me().id:
     	text = '【{} {}】总有刁民想害朕!'.format(update.effective_user.name,kick_user.name)
-    	bot.send_message(kick_user.chat_id,text)
-    	bot.delete_message(kick_user.chat_id, update.message.message_id)
+    	context.bot.send_message(kick_user.chat_id,text)
+    	context.bot.delete_message(kick_user.chat_id, update.message.message_id)
     	return
 
     key = str(kick_user.chat_id) + '-' + str(kick_user.user_id)
@@ -296,7 +296,7 @@ def fuck(bot, update,args):
     #print(type(mutetime1))
     
     try:
-        chat_member = bot.get_chat_member(kick_user.chat_id, kick_user.user_id)
+        chat_member = context.bot.get_chat_member(kick_user.chat_id, kick_user.user_id)
         print("chat_member=%s" % chat_member)
         until_date1 = chat_member.until_date
         print("v-until_date1=%s" % until_date1)
@@ -342,7 +342,7 @@ def fuck(bot, update,args):
     
     try:
         print("1-until_date=%s" % kick_user.until_date)
-        bot.restrict_chat_member(
+        context.bot.restrict_chat_member(
             kick_user.chat_id,
             kick_user.user_id,
             until_date= kick_user.until_date,
@@ -359,7 +359,7 @@ def fuck(bot, update,args):
     except BaseException as e:
         logging.error(e)
         text = '【{} {}】刚才发生了什么？'.format(update.effective_user.name,kick_user.name)
-        bot.send_message(kick_user.chat_id, text)
+        context.bot.send_message(kick_user.chat_id, text)
         #bot.delete_message(kick_user.chat_id, update.message.message_id)
         return
     try:
@@ -378,14 +378,14 @@ def fuck(bot, update,args):
         kickusers.save_kickuser(key, kick_user)
         try:
 
-            bot.delete_message(update.message.chat_id, update.message.message_id)
+            context.bot.delete_message(update.message.chat_id, update.message.message_id)
         except BaseException as e:
             logging.error(e)
 
         logging.info(kick_user.log())
 
 
-        bot.send_message(
+        context.bot.send_message(
             chat_id=kick_user.chat_id,
             text=base_text,
             #timeout=60,
@@ -398,7 +398,7 @@ def fuck(bot, update,args):
 
     
    
-def vote(bot, update):
+def vote(update,context):
         query = update.callback_query
         #print("query=%s" % query)
         msg = query.message
@@ -409,7 +409,7 @@ def vote(bot, update):
         print("vmutetime2=%s" % kick_user.mutetime2)
         print("vchatmembers=%s" % kick_user.chatmembers)
        
-        allmembers = bot.get_chat_members_count(kick_user.chat_id)
+        allmembers = context.bot.get_chat_members_count(kick_user.chat_id)
         try:
             max_vote = int(allmembers/kick_user.chatmembers)
             if max_vote <= 2:
@@ -429,26 +429,26 @@ def vote(bot, update):
 
         if not kick_user:
             try:
-                bot.delete_message(msg.chat_id, msg.message_id)
-                bot.answer_callback_query(query.id, "此投票已过期，清理成功")
+                context.bot.delete_message(msg.chat_id, msg.message_id)
+                context.bot.answer_callback_query(query.id, "此投票已过期，清理成功")
             except BaseException as e:
                 logging.error(e)
-                bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
+                context.bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
             return
 
         if cmd == 'delete':
             try:
-                bot.delete_message(msg.chat_id, msg.message_id)
+                context.bot.delete_message(msg.chat_id, msg.message_id)
             except BaseException as e:
                 logging.error(e)
-                bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
+                context.bot.answer_callback_query(query.id, "超出Bot控制范围，请联系非Bot管理员")
 
             if kick_user and kick_user.agree_counter() > max_vote//2:
                 try:
-                    bot.delete_message(kick_user.chat_id, kick_user.message_id)
+                    context.bot.delete_message(kick_user.chat_id, kick_user.message_id)
                 except BaseException as e:
                     logging.error(e)
-                    bot.answer_callback_query(query.id, "被举报消息已被删除或超出Bot控制范围")
+                    context.bot.answer_callback_query(query.id, "被举报消息已被删除或超出Bot控制范围")
             if key:
                 kickusers.remove_kickuser(key)
             return
@@ -456,7 +456,7 @@ def vote(bot, update):
         if kick_user.vote_counter() >= max_vote:
             try:
                 print(">= max_vote")
-                bot.answer_callback_query(query.id, "此投票已过期!")
+                context.bot.answer_callback_query(query.id, "此投票已过期!")
             except BaseException as e:
                 logging.error(e)
             return
@@ -480,12 +480,12 @@ def vote(bot, update):
                 ret_disagree = kick_user.add_disagree(query.from_user)
 
             if not (ret_agree and ret_disagree):
-                bot.answer_callback_query(query.id, "请勿重复投票")
+                context.bot.answer_callback_query(query.id, "请勿重复投票")
                 return
             else:
-                bot.answer_callback_query(query.id, "投票成功")
-                bot.delete_message(chat_id=msg.chat.id,message_id=msg.message_id)
-                bot.send_message(
+                context.bot.answer_callback_query(query.id, "投票成功")
+                context.bot.delete_message(chat_id=msg.chat.id,message_id=msg.message_id)
+                context.bot.send_message(
                     chat_id=msg.chat_id,
                     text=base_text,
                     #timeout=60,
@@ -532,7 +532,7 @@ def vote(bot, update):
                         print("c")
                         print(c)
                         #bot.kick_chat_member(kick_user.chat_id, kick_user.user_id)
-                        bot.restrict_chat_member(
+                        context.bot.restrict_chat_member(
                             kick_user.chat_id,
                             kick_user.user_id,
                             permissions=ChatPermissions(
@@ -552,7 +552,7 @@ def vote(bot, update):
                     try:
                         text = '经投票,不同意禁言【{} {}】,已恢复该用户原有权限'.format(kick_user.name,kick_user.user_id)
                         print("t-until_date=%s" % kick_user.until_date)
-                        bot.restrict_chat_member(
+                        context.bot.restrict_chat_member(
                             kick_user.chat_id,
                             kick_user.user_id,
                             permissions=ChatPermissions(
@@ -573,7 +573,7 @@ def vote(bot, update):
     ##                reply_markup=delete_keyboard(key))
                 
 
-                bot.send_message(
+                context.bot.send_message(
                     chat_id=msg.chat_id,
                     text=text,
                     #timeout=60,
