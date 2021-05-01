@@ -2,7 +2,7 @@ import re
 import logging
 import time
 from telegram import ChatPermissions,ChatMember
-def clear_tmessage(bot, update):
+def clear_tmessage(update,context):
     try:        
         ltext=len(update.message.text)
         print("fupdate=%s" % update)
@@ -18,36 +18,42 @@ def clear_tmessage(bot, update):
         fname = update.message.from_user.first_name
         fnum = re.search("\d{8}",fname)
         strname = 0
-        lnum = None
-        unum = None
         try:
             lname = update.message.from_user.last_name
             print("lname=%s" % lname)
-            lnum = re.search("\d{8}",lname)
-            print("lnum=%s" % lnum)
-            strname=len(lname)
+            if lname != None:
+                lnum = re.search("\d{8}",lname)
+                print("lnum=%s" % lnum)
+                strname=len(lname)
+            else:
+                return
         except Exception as e:
+            lnum = None
             logging.error(e)
         try:
             uname = update.message.from_user.username
             print("uname=%s" % uname)
-            unum = re.search("\d{8}",uname)
-            print("unum=%s" % unum)
+            if  uname != None:
+                unum = re.search("\d{8}",uname)
+                print("unum=%s" % unum)
+            else:
+               return
         except Exception as e:
+            unum = None
             logging.error(e)
                 
         if len(fname) > 30 or strname > 20 or fnum != None or lnum != None or unum != None:
-            bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
+            context.bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
             text = '【{},{}】 名字有广告，被踢出！'.format(fname,lname)
             #bot.send_message(update.message.chat_id, text)
-            query = bot.send_message(update.message.chat_id, text)
+            query = context.bot.send_message(update.message.chat_id, text)
             message_id1=query.message_id
             print("send_message1=%s" % query)
             time.sleep(3)
-            bot.delete_message(update.message.chat_id,message_id1)            
+            context.bot.delete_message(update.message.chat_id,message_id1)            
         if ltext > 666  or ltext == 1 :
-            bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
-            bot.restrict_chat_member(
+            context.bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
+            context.bot.restrict_chat_member(
                 update.message.chat_id,
                 update.message.from_user.id,
                 until_date=int(time.time()+3600),
@@ -61,10 +67,10 @@ def clear_tmessage(bot, update):
                     can_invite_users=False,
                     can_pin_messages=False))
             text = '【{}】 刷屏，禁言1小时'.format(update.message.from_user.name)
-            bot.send_message(update.message.chat_id, text)
+            context.bot.send_message(update.message.chat_id, text)
         if tnum1 != None:
-            bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
-            bot.restrict_chat_member(
+            context.bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
+            context.bot.restrict_chat_member(
             update.message.chat_id,
             update.message.from_user.id,
             until_date=int(time.time()+3600*8),
@@ -78,10 +84,10 @@ def clear_tmessage(bot, update):
                 can_invite_users=False,
                 can_pin_messages=False))
             text = '【{}】 乱发广告，禁言8小时'.format(update.message.from_user.name)
-            bot.send_message(update.message.chat_id, text)
+            context.bot.send_message(update.message.chat_id, text)
         if tnum2 != None:
-            bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
-            bot.restrict_chat_member(
+            context.bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)
+            context.bot.restrict_chat_member(
                 update.message.chat_id,
                 update.message.from_user.id,
                 until_date=int(time.time()+60),
@@ -99,9 +105,9 @@ def clear_tmessage(bot, update):
         logging.error(e)
 
 
-def clear_jlmessage(bot, update):
+def clear_jlmessage(update,context):
     try: 
-        bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)       
+        context.bot.delete_message(chat_id=update.message.chat_id,message_id=update.message.message_id)       
         fname = update.message.from_user.first_name
         fnum = re.search("\d{8}",fname)
         strname = 0
@@ -124,13 +130,13 @@ def clear_jlmessage(bot, update):
             logging.error(e)
                 
         if len(fname) > 30 or strname > 20 or fnum != None or lnum != None or unum != None:
-            bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
+            context.bot.kick_chat_member(update.message.chat_id, update.message.from_user.id,until_date=int(time.time()+60))
             text = '【{},{}】 名字有广告，被踢出！'.format(fname,lname)
             #bot.send_message(update.message.chat_id, text)
-            query = bot.send_message(update.message.chat_id, text)
+            query = context.bot.send_message(update.message.chat_id, text)
             message_id1=query.message_id
             print("send_message2=%s" % query)
             time.sleep(3)
-            bot.delete_message(update.message.chat_id,message_id1)
+            context.bot.delete_message(update.message.chat_id,message_id1)
     except Exception as e:
         logging.error(e)
