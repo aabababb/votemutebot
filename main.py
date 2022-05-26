@@ -13,8 +13,8 @@ logging.basicConfig(level=logging.INFO,
 
 if __name__ == '__main__':
     logging.info('admin bot started')
-    token = sys.argv[1]
+    token1 = sys.argv[1]
     mutetime1 = sys.argv[2]
-    bot = AdminBot(token)
+    bot = AdminBot(token1)
     bot.run(mutetime1)
 
