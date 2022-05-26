@@ -1,7 +1,7 @@
 # coding=UTF-8
 import logging
 from telegram.ext import CommandHandler, MessageHandler, Updater, Filters, CallbackQueryHandler
-
+from telegram import Update
 from vote import fuck, vote,get_mutetime1
 from clear import clear_jlmessage,clear_tmessage
 from filters import status_update,ftext
@@ -11,13 +11,16 @@ from cao import cao
 
 
 class AdminBot():
-    def __init__(self, token):
-        self.updater = Updater(token=token)
+    def __init__(self, token1):
+        self.updater = Updater(token=token1,use_context=True)
+        print(self.updater)
         self.dp = self.updater.dispatcher
-
-    def error(self, bot, update,error):
+        print(self.dp)
+        logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                     level=logging.INFO)
+    def error(self, update,context,error):
         try:
-            bot.deleteWebhook()
+            context.bot.deleteWebhook()
             raise error
         except Exception as e:
             logging.error(e)
