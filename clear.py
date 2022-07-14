@@ -100,11 +100,11 @@ def clear_tmessage(update: Update, context: CallbackContext):
 
 def clear_jlmessage(update: Update, context: CallbackContext):
     try: 
-        context.bot.delete_message(chat_id=update.messages.chat_id,message_id=update.messages.message_id)
         if update.message != None:
             update.messages = update.message
         else:
-            update.messages = update.edited_message       
+            update.messages = update.edited_message
+        context.bot.delete_message(chat_id=update.messages.chat_id,message_id=update.messages.message_id)
         fname = update.messages.from_user.first_name
         fnum = re.search("\d{8}",fname)
         strname = 0
